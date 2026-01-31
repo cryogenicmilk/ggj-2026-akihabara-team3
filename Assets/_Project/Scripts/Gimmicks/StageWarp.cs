@@ -5,7 +5,7 @@ public class StageWarp : MonoBehaviour
 {
     public Transform warpPoint;
     public CameraFader fader;   //フェード管理
-    public string playerTag = "player";
+    public string playerTag = "Player";
     
     private bool warping = false;
 
@@ -23,7 +23,9 @@ public class StageWarp : MonoBehaviour
         warping = true;
         yield return fader.FadeOut();
         player.position = warpPoint.position;
-        yield return new WaitForSeconds(0.2f);
+        Time.timeScale = 0.0f;
+        yield return new WaitForSecondsRealtime(0.2f);
+        Time.timeScale = 1.0f;
         yield return fader.FadeIn();
         warping = false;
     }
