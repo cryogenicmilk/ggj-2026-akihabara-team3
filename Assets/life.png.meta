@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: ac9caffa7e6b3aa47bb37f1edcca929e
+guid: 245c163965261a74da4df9887446abfa
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5112164402502377831
-    second: kibori_0
+      213: -3359916698839239071
+    second: life_0
+  - first:
+      213: -3930883525495038881
+    second: life_1
+  - first:
+      213: -6974071674910835800
+    second: life_2
+  - first:
+      213: -5548975891121717205
+    second: life_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +135,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: kibori_0
+      name: life_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 0
-        width: 150
-        height: 160
+        x: 0
+        y: 7
+        width: 125
+        height: 114
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +150,74 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7612d8c407e02f640800000000000000
-      internalID: 5112164402502377831
+      spriteID: 166b8c2609d2f51d0800000000000000
+      internalID: -3359916698839239071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: life_1
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 7
+        width: 128
+        height: 114
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5cde61a242b279c0800000000000000
+      internalID: -3930883525495038881
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: life_2
+      rect:
+        serializedVersion: 2
+        x: 257
+        y: 7
+        width: 128
+        height: 114
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ab73da03ce173f90800000000000000
+      internalID: -6974071674910835800
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: life_3
+      rect:
+        serializedVersion: 2
+        x: 386
+        y: 7
+        width: 126
+        height: 114
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b20cb76a3d31ef2b0800000000000000
+      internalID: -5548975891121717205
       vertices: []
       indices: 
       edges: []
@@ -161,7 +236,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      kibori_0: 5112164402502377831
+      life_0: -3359916698839239071
+      life_1: -3930883525495038881
+      life_2: -6974071674910835800
+      life_3: -5548975891121717205
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
