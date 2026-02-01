@@ -5,6 +5,8 @@ public class GameFlowManager : MonoBehaviour
 {
     public static GameFlowManager Instance;
 
+    [SerializeField] private GameObject VolPanel;
+
     string lastPlaySceneName;
 
     void Awake()
@@ -18,6 +20,13 @@ public class GameFlowManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        SetVolPanel(false);
+    }
+
+    public void SetVolPanel(bool isOpen)
+    {
+        VolPanel.SetActive(isOpen);
     }
 
     // プレイシーンに入るときに呼ぶ
