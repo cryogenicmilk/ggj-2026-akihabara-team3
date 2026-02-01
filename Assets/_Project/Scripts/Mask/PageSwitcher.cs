@@ -5,9 +5,10 @@ using System.Collections;
 public class PageSwitcher : MonoBehaviour
 {
     [Header("Pages")]
-    [SerializeField] GameObject[] pages;
+    [SerializeField] GameObject[] pages;   // 0:初期世界, 1:ページ2, 2:ページ3
 
     [Header("Mask UI")]
+    [SerializeField] GameObject maskUIRoot;
     [SerializeField] Image currentMaskImage;
     [SerializeField] Image nextMaskImage;
     [SerializeField] Image prevMaskImage;
@@ -17,72 +18,177 @@ public class PageSwitcher : MonoBehaviour
     [SerializeField] CanvasGroup fadeOverlay;
     [SerializeField] float fadeDuration = 0.3f;
 
-    int currentIndex;
+    int currentMaskIndex = -1;     // 装備中の仮面（-1 = 未装備）
+    int activePageIndex = 0;       // 表示中のページ
+
     bool isFading;
+    bool[] unlockedMasks;
 
     void Start()
     {
-        currentIndex = Mathf.Clamp(
-            PageState.CurrentPageIndex,
-            0,
-            pages.Length - 1
-        );
+        unlockedMasks = new bool[pages.Length];
 
+        // 初期化
         for (int i = 0; i < pages.Length; i++)
-            pages[i].SetActive(i == currentIndex);
+        {
+            unlockedMasks[i] = false;
+            pages[i].SetActive(false);
+        }
+
+        // 初期世界（ページ1）
+        activePageIndex = 0;
+        pages[activePageIndex].SetActive(true);
 
         fadeOverlay.alpha = 0f;
+        maskUIRoot.SetActive(false);
+
         UpdateMaskUI();
     }
 
     void Update()
     {
         if (isFading) return;
+        if (!AnyMaskUnlocked()) return;
 
         if (Input.GetKeyDown(KeyCode.E))
-            StartCoroutine(FadeSwitch(GetNextIndex()));
+            StartCoroutine(FadeSwitch(GetNextMask()));
 
         if (Input.GetKeyDown(KeyCode.Q))
-            StartCoroutine(FadeSwitch(GetPrevIndex()));
+            StartCoroutine(FadeSwitch(GetPrevMask()));
     }
 
-    int GetNextIndex()
+    // ===== 仮面取得 =====
+    public void UnlockPage(int maskIndex)
     {
-        return (currentIndex + 1) % pages.Length;
+        if (maskIndex < 0 || maskIndex >= unlockedMasks.Length)
+            return;
+
+        unlockedMasks[maskIndex] = true;
+
+        maskUIRoot.SetActive(true);
+        UpdateMaskUI();
     }
 
-    int GetPrevIndex()
+    // ===== フェード付き切替 =====
+    IEnumerator FadeSwitch(int nextMaskIndex)
     {
-        return (currentIndex - 1 + pages.Length) % pages.Length;
-    }
+        if (nextMaskIndex == -1) yield break;
+        if (!unlockedMasks[nextMaskIndex]) yield break;
+        if (currentMaskIndex == nextMaskIndex) yield break;
 
-    IEnumerator FadeSwitch(int nextIndex)
-    {
         isFading = true;
 
-        // フェードアウト
         yield return FadeOverlay(0f, 1f);
 
-        pages[currentIndex].SetActive(false);
-        currentIndex = nextIndex;
-        pages[currentIndex].SetActive(true);
-        PageState.CurrentPageIndex = currentIndex;
+        // 今のページをOFF
+        pages[activePageIndex].SetActive(false);
+
+        // 仮面装備
+        currentMaskIndex = nextMaskIndex;
+
+        // ★ 仮面 → ページ変換（1つ先）
+        activePageIndex = (currentMaskIndex + 1) % pages.Length;
+
+        // 新ページON
+        pages[activePageIndex].SetActive(true);
 
         UpdateMaskUI();
 
-        // フェードイン
         yield return FadeOverlay(1f, 0f);
 
         isFading = false;
     }
 
-    void UpdateMaskUI()
+    // ===== 次の仮面 =====
+    int GetNextMask()
     {
-        currentMaskImage.sprite = maskInfos[currentIndex].icon;
-        nextMaskImage.sprite = maskInfos[GetNextIndex()].icon;
-        prevMaskImage.sprite = maskInfos[GetPrevIndex()].icon;
+        if (currentMaskIndex == -1)
+            return GetFirstUnlockedMask();
+
+        int index = currentMaskIndex;
+
+        for (int i = 0; i < unlockedMasks.Length; i++)
+        {
+            index = (index + 1) % unlockedMasks.Length;
+            if (unlockedMasks[index])
+                return index;
+        }
+
+        return currentMaskIndex;
     }
 
+    // ===== 前の仮面 =====
+    int GetPrevMask()
+    {
+        if (currentMaskIndex == -1)
+            return GetFirstUnlockedMask();
+
+        int index = currentMaskIndex;
+
+        for (int i = 0; i < unlockedMasks.Length; i++)
+        {
+            index = (index - 1 + unlockedMasks.Length) % unlockedMasks.Length;
+            if (unlockedMasks[index])
+                return index;
+        }
+
+        return currentMaskIndex;
+    }
+
+    int GetFirstUnlockedMask()
+    {
+        for (int i = 0; i < unlockedMasks.Length; i++)
+            if (unlockedMasks[i])
+                return i;
+
+        return -1;
+    }
+
+    bool AnyMaskUnlocked()
+    {
+        for (int i = 0; i < unlockedMasks.Length; i++)
+            if (unlockedMasks[i]) return true;
+
+        return false;
+    }
+
+    // ===== UI =====
+    void UpdateMaskUI()
+    {
+        if (currentMaskIndex == -1)
+        {
+            currentMaskImage.enabled = false;
+
+            int next = GetFirstUnlockedMask();
+            if (next != -1)
+            {
+                nextMaskImage.sprite = maskInfos[next].icon;
+                nextMaskImage.enabled = true;
+            }
+            else
+            {
+                nextMaskImage.enabled = false;
+            }
+
+            prevMaskImage.enabled = false;
+            return;
+        }
+
+        currentMaskImage.sprite = maskInfos[currentMaskIndex].icon;
+        currentMaskImage.enabled = true;
+
+        int nextIndex = GetNextMask();
+        nextMaskImage.enabled = nextIndex != currentMaskIndex;
+        if (nextMaskImage.enabled)
+            nextMaskImage.sprite = maskInfos[nextIndex].icon;
+
+        int prevIndex = GetPrevMask();
+        prevMaskImage.enabled = prevIndex != currentMaskIndex;
+        if (prevMaskImage.enabled)
+            prevMaskImage.sprite = maskInfos[prevIndex].icon;
+    }
+
+    // ===== Fade =====
     IEnumerator FadeOverlay(float from, float to)
     {
         float t = 0f;
