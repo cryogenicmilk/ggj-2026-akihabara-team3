@@ -3,6 +3,29 @@ using UnityEngine.SceneManagement;
 
 public class GameFlowManager : MonoBehaviour
 {
+    public static GameFlowManager Instance;
+
+    string lastPlaySceneName;
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    // プレイシーンに入るときに呼ぶ
+    public void SetLastPlayScene(string sceneName)
+    {
+        lastPlaySceneName = sceneName;
+    }
+
     // ゲーム終了（ビルド時のみ有効）
     public void QuitGame()
     {
