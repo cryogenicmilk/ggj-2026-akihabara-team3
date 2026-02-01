@@ -3,15 +3,17 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float _moveSpeed = 5f;
+    [SerializeField] private float _moveSpeed = 5f;
+    [SerializeField] SpriteRenderer spriteRenderer;
 
     private Vector2 _moveInput;
     private Rigidbody2D _rb;
-
+    private Animator _animator;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _animator = GetComponent<Animator>();
     }
 
     public void OnMove(InputValue value)
@@ -21,20 +23,45 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _rb.linearVelocity = _moveInput * _moveSpeed;
-
-        UpdateDirectino();
+        Move();
+        UpdateAnimation();
     }
 
-    void UpdateDirectino()
+    private void Move()
     {
-        if (_moveInput.x > 0)
+        _rb.linearVelocity = _moveInput * _moveSpeed;
+    }
+
+    void UpdateAnimation()
+    {
+        bool isWalking = _moveInput.magnitude > 0.1f;
+        _animator.SetBool("Walk", isWalking);
+
+        // ‘S•”false‚É‚·‚é
+        _animator.SetBool("FaceUp", false);
+        _animator.SetBool("FaceDown", false);
+        _animator.SetBool("FaceLeft", false);
+        _animator.SetBool("FaceRight", false);
+
+        float threshold = 0.3f; // “ü—Í”»’è‚Ì‚µ‚«‚¢’l
+
+        if (_moveInput.y > threshold)
         {
-            transform.localScale = new Vector3(1, 1, 1);
+            _animator.SetBool("FaceUp", true);
         }
-        else if (_moveInput.y > 0)
+        else if (_moveInput.y < -threshold)
         {
-            transform.localScale = new Vector3(-1, -1, -1);
+            _animator.SetBool("FaceDown", true);
+        }
+        else if (_moveInput.x > threshold)
+        {
+            _animator.SetBool("FaceRight", true);
+            spriteRenderer.flipX = false;
+        }
+        else if (_moveInput.x < -threshold)
+        {
+            _animator.SetBool("FaceLeft", true);
+            spriteRenderer.flipX = true;
         }
     }
 }
