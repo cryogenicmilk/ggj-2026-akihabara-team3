@@ -4,7 +4,6 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float _moveSpeed = 5f;
-    [SerializeField] SpriteRenderer spriteRenderer;
 
     private Vector2 _moveInput;
     private Rigidbody2D _rb;
@@ -19,49 +18,23 @@ public class PlayerMovement : MonoBehaviour
     public void OnMove(InputValue value)
     {
         _moveInput = value.Get<Vector2>();
+
+        // Animatorに移動方向を渡す（将来の上下アニメ用にYも渡す）
+        _animator.SetFloat("MoveX", _moveInput.x);
+        _animator.SetFloat("MoveY", _moveInput.y);
+
+        // 移動しているかどうか
+        bool isMoving = (_moveInput.sqrMagnitude > 0.01f);
+        _animator.SetBool("isMoving", isMoving);
     }
 
     private void FixedUpdate()
     {
         Move();
-        UpdateAnimation();
     }
 
     private void Move()
     {
         _rb.linearVelocity = _moveInput * _moveSpeed;
-    }
-
-    void UpdateAnimation()
-    {
-        bool isWalking = _moveInput.magnitude > 0.1f;
-        _animator.SetBool("Walk", isWalking);
-
-        // 全部falseにする
-        _animator.SetBool("FaceUp", false);
-        _animator.SetBool("FaceDown", false);
-        _animator.SetBool("FaceLeft", false);
-        _animator.SetBool("FaceRight", false);
-
-        float threshold = 0.3f; // 入力判定のしきい値
-
-        if (_moveInput.y > threshold)
-        {
-            _animator.SetBool("FaceUp", true);
-        }
-        else if (_moveInput.y < -threshold)
-        {
-            _animator.SetBool("FaceDown", true);
-        }
-        else if (_moveInput.x > threshold)
-        {
-            _animator.SetBool("FaceRight", true);
-            spriteRenderer.flipX = false;
-        }
-        else if (_moveInput.x < -threshold)
-        {
-            _animator.SetBool("FaceLeft", true);
-            spriteRenderer.flipX = true;
-        }
     }
 }
